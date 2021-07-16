@@ -34,6 +34,8 @@ $ npm install || yarn
 
 ## Running the app
 
+
+
 ```bash
 # development
 $ npm run start:debug || yarn start:debug
@@ -44,6 +46,10 @@ $ npm run start:dev || yarn start:dev
 # production mode
 $ npm run start:prod || yarn start:prod
 ```
+
+Lembrar de instalar o WSL2 e Docker. Vejo o vídeo: [https://www.youtube.com/watch?v=j6ioaes03oY](https://www.youtube.com/watch?v=j6ioaes03oY) 
+
+Siga o guia rápido de instalação: [https://github.com/codeedu/wsl2-docker-quickstart](https://github.com/codeedu/wsl2-docker-quickstart) 
 
 ## Test
 
