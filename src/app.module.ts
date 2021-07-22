@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppService } from './app.service';
 import { ormConfig } from './orm/ormConfig';
 import { join } from 'path';
+import { CategoriasModule } from './categorias/categorias.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { join } from 'path';
       rootPath: join(__dirname, '..', 'public'),
     }),
     TypeOrmModule.forRoot(ormConfig),
+    CategoriasModule,
   ],
   providers: [AppService],
 })
