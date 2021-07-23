@@ -1,26 +1,64 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AppMessage } from 'src/common/appMessage.common';
+import { Repository } from 'typeorm';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
+import { Categoria } from './entities/categoria.entity';
 
 @Injectable()
 export class CategoriasService {
-  create(createCategoriaDto: CreateCategoriaDto) {
-    return 'This action adds a new categoria';
+  constructor(
+    @InjectRepository(Categoria)
+    private readonly _categoriaRepository: Repository<Categoria>,
+  ) {}
+
+  async create(dto: CreateCategoriaDto) {
+    const categoria = new Categoria(dto.titulo);
+
+    const categoriaCriada = await this._categoriaRepository.save(categoria);
+
+    return categoriaCriada;
   }
 
   findAll() {
-    return `This action returns all categorias`;
+    return this._categoriaRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} categoria`;
+    return this._categoriaRepository.findOne(id);
   }
 
-  update(id: number, updateCategoriaDto: UpdateCategoriaDto) {
-    return `This action updates a #${id} categoria`;
+  async update(
+    id: number,
+    dto: UpdateCategoriaDto,
+  ): Promise<Categoria | AppMessage> {
+    const categoria = await this.findOne(id);
+
+    if (!categoria) {
+      return {
+        message: ['Categoria não existe! Tente outro id.'],
+      };
+    }
+
+    await this._categoriaRepository.save({ id, ...dto });
+
+    const categoriaAtualizada = await this.findOne(id);
+
+    return categoriaAtualizada;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} categoria`;
+  async remove(id: number): Promise<AppMessage | null> {
+    const categoria = await this.findOne(id);
+
+    if (!categoria) {
+      return {
+        message: ['Categoria não existe! Tente outro id.'],
+      };
+    }
+
+    await this._categoriaRepository.delete(id);
+
+    return null;
   }
 }

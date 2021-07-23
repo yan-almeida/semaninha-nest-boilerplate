@@ -26,7 +26,7 @@ async function bootstrap() {
   app.use(responseMiddleware);
   app.enableCors();
 
-  await app.listen(process.env.PORT || 3333);
+  await app.listen(3000);
   const url = await app.getUrl();
 
   logger.debug(`Swagger application is running on: ${url}/swagger`);

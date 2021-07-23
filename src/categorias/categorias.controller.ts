@@ -1,34 +1,130 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Res,
+  ParseIntPipe,
+  ParseUUIDPipe,
+} from '@nestjs/common';
+import {
+  ApiCreatedResponse,
+  ApiNoContentResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
+import { Response } from 'express';
+import { ApiController } from 'src/decorators/apiController.decorator';
 import { CategoriasService } from './categorias.service';
+import { CategoriaDto } from './dto/categoria.dto';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto';
+import { Categoria } from './entities/categoria.entity';
 
-@Controller('categorias')
+@ApiController('categorias')
 export class CategoriasController {
-  constructor(private readonly categoriasService: CategoriasService) {}
+  constructor(private readonly _categoriasService: CategoriasService) {}
 
   @Post()
-  create(@Body() createCategoriaDto: CreateCategoriaDto) {
-    return this.categoriasService.create(createCategoriaDto);
+  @ApiCreatedResponse({
+    description: 'Criação de Categoria',
+    type: CategoriaDto,
+  })
+  async create(@Body() dto: CreateCategoriaDto, @Res() res: Response) {
+    const result = await this._categoriasService.create(dto);
+
+    if (result instanceof Categoria) {
+      const categoria: CategoriaDto = {
+        id: result.id,
+        titulo: result.titulo,
+      };
+
+      return res.created(categoria);
+    }
+
+    return res.badRequest();
   }
 
   @Get()
-  findAll() {
-    return this.categoriasService.findAll();
+  @ApiOkResponse({
+    description: 'Listagem de todas as Categorias',
+    type: [CategoriaDto],
+  })
+  async findAll(@Res() res: Response) {
+    const result = await this._categoriasService.findAll();
+
+    if (Array.isArray(result) && result.length !== 0) {
+      const categorias: CategoriaDto[] = [];
+
+      for (const item of result) {
+        const categoria: CategoriaDto = {
+          id: item.id,
+          titulo: item.titulo,
+        };
+
+        categorias.push(categoria);
+      }
+
+      return res.ok(categorias);
+    }
+
+    return res.notFound();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.categoriasService.findOne(+id);
+  @ApiOkResponse({
+    description: 'Listagem de uma Categoria',
+    type: CategoriaDto,
+  })
+  async findOne(@Param('id') id: string, @Res() res: Response) {
+    const result = await this._categoriasService.findOne(+id);
+
+    if (result instanceof Categoria) {
+      const categoria: CategoriaDto = {
+        id: result.id,
+        titulo: result.titulo,
+      };
+
+      return res.ok(categoria);
+    }
+
+    return res.notFound();
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoriaDto: UpdateCategoriaDto) {
-    return this.categoriasService.update(+id, updateCategoriaDto);
+  @ApiOkResponse({
+    description: 'Atualização de uma Categoria',
+    type: CategoriaDto,
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() dto: UpdateCategoriaDto,
+    @Res() res: Response,
+  ) {
+    const result = await this._categoriasService.update(+id, dto);
+
+    if (result instanceof Categoria) {
+      const categoria: CategoriaDto = {
+        id: result.id,
+        titulo: result.titulo,
+      };
+
+      return res.ok(categoria);
+    }
+
+    return res.notFound();
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.categoriasService.remove(+id);
+  @ApiNoContentResponse({ description: 'Deleção de categoria' })
+  async remove(@Param('id') id: string, @Res() res: Response) {
+    const result = await this._categoriasService.remove(+id);
+
+    if (!result) {
+      return res.noContent();
+    }
+
+    return res.notFound(result);
   }
 }
