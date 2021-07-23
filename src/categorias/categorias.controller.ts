@@ -16,6 +16,7 @@ import {
 } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ApiController } from 'src/decorators/apiController.decorator';
+import { ProdutoDto } from 'src/produtos/dto/produto.dto';
 import { CategoriasService } from './categorias.service';
 import { CategoriaDto } from './dto/categoria.dto';
 import { CreateCategoriaDto } from './dto/create-categoria.dto';
@@ -87,6 +88,43 @@ export class CategoriasController {
       };
 
       return res.ok(categoria);
+    }
+
+    return res.notFound();
+  }
+
+  @Get(':id/produtos')
+  @ApiOkResponse({
+    description: 'Listagem de Prodtuos de uma Categoria',
+    type: [ProdutoDto],
+  })
+  async findOneProdutosCategoria(
+    @Param('id') id: string,
+    @Res() res: Response,
+  ) {
+    const result = await this._categoriasService.findOneProdutosCategoria(+id);
+
+    if (result instanceof Categoria) {
+      if (Array.isArray(result.produtos) && result.produtos.length !== 0) {
+        const produtos: ProdutoDto[] = [];
+
+        for (const item of result.produtos) {
+          const produto: ProdutoDto = {
+            id: item.id,
+            titulo: item.titulo,
+            slug: item.slug,
+            categoriaTitulo: item.categoria.titulo,
+          };
+
+          produtos.push(produto);
+        }
+
+        return res.ok(produtos);
+      }
+
+      return res.notFound({
+        message: ['Nenhum produto cadastrado para esta categoria.'],
+      });
     }
 
     return res.notFound();

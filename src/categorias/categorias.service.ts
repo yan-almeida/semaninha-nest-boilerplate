@@ -29,6 +29,12 @@ export class CategoriasService {
     return this._categoriaRepository.findOne(id);
   }
 
+  findOneProdutosCategoria(id: number) {
+    return this._categoriaRepository.findOne(id, {
+      relations: ['produtos', 'produtos.categoria'],
+    });
+  }
+
   async update(
     id: number,
     dto: UpdateCategoriaDto,
@@ -50,6 +56,8 @@ export class CategoriasService {
 
   async remove(id: number): Promise<AppMessage | null> {
     const categoria = await this.findOne(id);
+
+    // verificar se o ARRAY de PRODUTOS de uma CATEGORIA está VAZIO!!!!!!
 
     if (!categoria) {
       return {

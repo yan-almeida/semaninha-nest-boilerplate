@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { ormConfig } from './orm/ormConfig';
 import { join } from 'path';
 import { CategoriasModule } from './categorias/categorias.module';
+import { ProdutosModule } from './produtos/produtos.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { CategoriasModule } from './categorias/categorias.module';
     }),
     TypeOrmModule.forRoot(ormConfig),
     CategoriasModule,
+    ProdutosModule,
   ],
   providers: [AppService],
 })
